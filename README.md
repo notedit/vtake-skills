@@ -31,8 +31,8 @@ Then invoke it from your agent (e.g. `/vtake-cut <video.mp4>` in Claude Code).
 
 The skill is self-contained except for these, which it resolves on demand:
 
-- **`vtake` CLI** — `extract` / `transcribe` / `doctor`, invoked via
-  `npx -y vtake@latest …` (published on npm; first call downloads it).
+- **`@notedit/vtake` CLI** — `extract` / `transcribe` / `doctor`, invoked via
+  `npx -y @notedit/vtake@latest …` (published on npm; first call downloads it).
 - **`hyperframes` CLI** — rendering, invoked via `npx hyperframes render`.
 - **system `ffmpeg` / `ffprobe`** — required for audio/metadata extraction.
 - macOS render: `export PRODUCER_BROWSER_GPU_MODE=hardware` strongly
