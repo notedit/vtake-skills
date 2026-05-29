@@ -5,19 +5,6 @@ description: Turn a local video into metadata, transcript, and an AI-composed ca
 
 # VTake Local Workflow
 
-> **Self-contained skill.** This skill is installed standalone (e.g. via
-> `npx skills add notedit/vtake-skills --skill vtake-cut --global`). It has
-> no dependency on the VTake monorepo. It relies only on:
-> - **`vtake` CLI** via `npx -y vtake@latest` (extract / transcribe / doctor),
-> - **`hyperframes` CLI** via `npx hyperframes` (render),
-> - **system `ffmpeg` / `ffprobe`**,
-> - bundled assets shipped inside this skill at `<SKILL_DIR>/assets/`
->   (fonts + `gsap.min.js`) and the design library at `<SKILL_DIR>/references/`.
->
-> `<SKILL_DIR>` is this skill's base directory — the host injects it at
-> invocation time as **"Base directory for this skill: …"**. Use that
-> absolute path wherever `<SKILL_DIR>` appears below.
-
 VTake converts a local input video into a card-based composition. The agent
 designs the cards (timing + content) and **writes each card's HTML directly
 in the conversation**, then assembles a single composition HTML and renders
@@ -38,7 +25,7 @@ Inspectable intermediate files in the work directory:
 ## CLI Resolution
 
 ```bash
-# vtake — for extract / transcribe / doctor (resolved from npm via npx)
+# vtake CLI — auto-downloaded from npm on first run
 npx -y vtake@latest --help
 
 # hyperframes — for rendering the assembled HTML to MP4
@@ -46,7 +33,6 @@ npx hyperframes render --help
 ```
 
 > Every `vtake …` command below is shorthand for `npx -y vtake@latest …`.
-> The first invocation downloads the package; subsequent calls are cached.
 
 ## Workflow
 
@@ -54,15 +40,14 @@ npx hyperframes render --help
 
 ```bash
 npx -y vtake@latest doctor
-# confirm this skill's bundled assets are present:
+# confirm bundled assets:
 ls "<SKILL_DIR>/assets/fonts" "<SKILL_DIR>/assets/vendor/gsap.min.js"
 ```
 
 Required:
 
-- `ffmpeg` / `ffprobe` (system) — checked by `vtake doctor`
-- `<SKILL_DIR>/assets/fonts/*.woff2`, `<SKILL_DIR>/assets/vendor/gsap.min.js`
-  (shipped inside this skill — staged into the work dir in Step 9)
+- `ffmpeg` / `ffprobe` (system)
+- `<SKILL_DIR>/assets/fonts/*.woff2`, `<SKILL_DIR>/assets/vendor/gsap.min.js` (bundled inside this skill, staged to work dir in Step 9)
 
 Optional:
 
@@ -89,7 +74,7 @@ mkdir -p "$WORK_DIR"
 ### 3. Extract Audio and Metadata
 
 ```bash
-vtake extract "$VIDEO_PATH" --out-dir "$WORK_DIR"
+npx -y vtake@latest extract "$VIDEO_PATH" --out-dir "$WORK_DIR"
 ```
 
 Outputs: `metadata.json` (duration, width, height, fps) + `audio.mp3`.
@@ -97,7 +82,7 @@ Outputs: `metadata.json` (duration, width, height, fps) + `audio.mp3`.
 ### 4. Transcribe
 
 ```bash
-vtake transcribe "$WORK_DIR/audio.mp3" --out-dir "$WORK_DIR" --asr elevenlabs
+npx -y vtake@latest transcribe "$WORK_DIR/audio.mp3" --out-dir "$WORK_DIR" --asr elevenlabs
 ```
 
 Output: `transcript.json` with `{ segments, words, raw }`.
@@ -518,10 +503,9 @@ Pick from these `themeId` palettes (use them as `--accent-N` /
 | slate | `#0ea5e9 #ef4444 #22c55e #f97316 #a855f7` | `#1e293b` | `#f1f5f9` |
 | mono | `#000 #555 #888 #aaa #ccc` | `#fff` | `#000` |
 
-Available fonts (woff2 in `<SKILL_DIR>/assets/fonts/`, staged into the work
-dir in Step 9): `Caveat` (handwriting), `LXGW WenKai TC` (Chinese
-hand-script), `Inter` (modern sans), `Virgil` (geometric hand). Reference
-via `@font-face` or `font-family` directly.
+Available fonts (woff2 in `<SKILL_DIR>/assets/fonts/`, staged to work dir in Step 9): `Caveat` (handwriting),
+`LXGW WenKai TC` (Chinese hand-script), `Inter` (modern sans), `Virgil`
+(geometric hand). Reference via `@font-face` or `font-family` directly.
 
 For inspiration on visual patterns, `<SKILL_DIR>/references/styles/`
 ships 10 self-contained reference cards (academic / editorial / minimal
@@ -529,7 +513,7 @@ ships 10 self-contained reference cards (academic / editorial / minimal
 you can copy as starting points — but **do not feel constrained to
 match any of these**. Each card is your own design.
 
-#### Visual Design Library (`<SKILL_DIR>/references/`)
+#### Visual Design Library (<SKILL_DIR>/references/)
 
 Beyond the composition-level `themeId`, the skill ships a richer **reference
 library** at `<SKILL_DIR>/references/` covering three **orthogonal**
@@ -1079,12 +1063,11 @@ to `card-cta-vtake.startSec`):**
 Stage the assets and write `$WORK_DIR/public/index.html`:
 
 ```bash
-# SKILL_DIR = this skill's base directory (injected as
-# "Base directory for this skill: …" at invocation time).
+# SKILL_DIR is injected by the host ("Base directory for this skill: …")
 SKILL_DIR="<SKILL_DIR>"
 
 mkdir -p "$WORK_DIR/public/fonts" "$WORK_DIR/public/vendor" "$WORK_DIR/public/cards"
-cp -n "$SKILL_DIR/assets/fonts/"*           "$WORK_DIR/public/fonts/"
+cp -n "$SKILL_DIR/assets/fonts/"*            "$WORK_DIR/public/fonts/"
 cp -n "$SKILL_DIR/assets/vendor/gsap.min.js" "$WORK_DIR/public/vendor/"
 # stage the input video so the composition can reference it by relative path
 ln -f "$VIDEO_PATH" "$WORK_DIR/public/input-video.mp4" 2>/dev/null \
