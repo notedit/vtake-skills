@@ -26,20 +26,20 @@ Inspectable intermediate files in the work directory:
 
 ```bash
 # vtake CLI — auto-downloaded from npm on first run
-npx -y vtake@latest --help
+npx -y @notedit/vtake@latest --help
 
 # hyperframes — for rendering the assembled HTML to MP4
 npx hyperframes render --help
 ```
 
-> Every `vtake …` command below is shorthand for `npx -y vtake@latest …`.
+> Every `vtake …` command below is shorthand for `npx -y @notedit/vtake@latest …`.
 
 ## Workflow
 
 ### 1. Check Environment
 
 ```bash
-npx -y vtake@latest doctor
+npx -y @notedit/vtake@latest doctor
 # confirm bundled assets:
 ls "<SKILL_DIR>/assets/fonts" "<SKILL_DIR>/assets/vendor/gsap.min.js"
 ```
@@ -74,7 +74,7 @@ mkdir -p "$WORK_DIR"
 ### 3. Extract Audio and Metadata
 
 ```bash
-npx -y vtake@latest extract "$VIDEO_PATH" --out-dir "$WORK_DIR"
+npx -y @notedit/vtake@latest extract "$VIDEO_PATH" --out-dir "$WORK_DIR"
 ```
 
 Outputs: `metadata.json` (duration, width, height, fps) + `audio.mp3`.
@@ -82,7 +82,7 @@ Outputs: `metadata.json` (duration, width, height, fps) + `audio.mp3`.
 ### 4. Transcribe
 
 ```bash
-npx -y vtake@latest transcribe "$WORK_DIR/audio.mp3" --out-dir "$WORK_DIR" --asr elevenlabs
+npx -y @notedit/vtake@latest transcribe "$WORK_DIR/audio.mp3" --out-dir "$WORK_DIR" --asr elevenlabs
 ```
 
 Output: `transcript.json` with `{ segments, words, raw }`.
